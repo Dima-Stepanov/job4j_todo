@@ -20,7 +20,9 @@ import java.util.Objects;
 public class Item implements Comparable<Item> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "item_id")
     private int id;
+    @Column(name = "item_name", unique = true)
     private String name;
     private String description;
     private LocalDateTime created = LocalDateTime.now().withNano(0);
