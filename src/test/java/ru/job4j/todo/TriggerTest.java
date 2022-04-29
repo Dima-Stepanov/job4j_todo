@@ -2,8 +2,6 @@ package ru.job4j.todo;
 
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
 /**
@@ -19,6 +17,6 @@ public class TriggerTest {
         Trigger trigger = new Trigger();
         int result = trigger.getInt();
         int expected = 1;
-        assertThat(result, is(expected));
+        assertEquals(result, expected);
     }
 }

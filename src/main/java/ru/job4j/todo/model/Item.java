@@ -20,7 +20,9 @@ import java.util.Objects;
 public class Item implements Comparable<Item> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "item_id")
     private int id;
+    @Column(name = "item_name", unique = true)
     private String name;
     private String description;
     private LocalDateTime created = LocalDateTime.now().withNano(0);
@@ -100,12 +102,12 @@ public class Item implements Comparable<Item> {
             return false;
         }
         Item item = (Item) o;
-        return id == item.id && Objects.equals(name, item.name) && Objects.equals(description, item.description) && Objects.equals(created, item.created) && Objects.equals(done, item.done);
+        return id == item.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, created, done);
+        return Objects.hash(id);
     }
 
     @Override
