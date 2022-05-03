@@ -1,6 +1,7 @@
 package ru.job4j.todo.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -17,19 +18,14 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "items")
-public class Item implements Comparable<Item> {
+public class Item implements Comparable<Item>, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
     private int id;
-    @Column(name = "item_name", unique = true)
     private String name;
     private String description;
     private LocalDateTime created = LocalDateTime.now().withNano(0);
     private LocalDateTime done;
-    @Transient
-    private final DateTimeFormatter
-            timeFormatter = DateTimeFormatter.ofPattern("dd-MMMM-EEEE-yyyy HH:mm:ss");
 
     public Item() {
     }
@@ -51,6 +47,21 @@ public class Item implements Comparable<Item> {
         this.id = id;
         this.name = name;
         this.description = description;
+    }
+
+    public Item(int id, String name, String description, LocalDateTime created, LocalDateTime done) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.created = created;
+        this.done = done;
+    }
+
+    public Item(String name, String description, LocalDateTime created, LocalDateTime done) {
+        this.name = name;
+        this.description = description;
+        this.created = created;
+        this.done = done;
     }
 
     public int getId() {
@@ -81,12 +92,20 @@ public class Item implements Comparable<Item> {
         return created;
     }
 
+    public String getCreatedFormat() {
+        return DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss").format(created);
+    }
+
     public void setCreated(LocalDateTime created) {
         this.created = created;
     }
 
     public LocalDateTime getDone() {
         return done;
+    }
+
+    public String getDoneFormat() {
+        return DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss").format(done);
     }
 
     public void setDone(LocalDateTime done) {
@@ -113,7 +132,9 @@ public class Item implements Comparable<Item> {
     @Override
     public String toString() {
         return String.format("id: %s, name: %s, description: %s, create: %s, done %s",
-                id, name, description, timeFormatter.format(created), timeFormatter.format(done));
+                id, name, description,
+                DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss").format(created),
+                DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss").format(done));
     }
 
     @Override

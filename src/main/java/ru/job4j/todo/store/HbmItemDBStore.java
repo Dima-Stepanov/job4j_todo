@@ -6,7 +6,6 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Item;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +39,7 @@ public class HbmItemDBStore implements Store<Item> {
         Session session = sf.openSession();
         session.beginTransaction();
         session.save(item);
-        Optional<Item> result = Optional.ofNullable(session.get(Item.class, item.getId()));
+        Optional<Item> result = Optional.of(session.load(Item.class, item.getId()));
         Transaction tr = session.getTransaction();
         tr.commit();
         session.close();
@@ -55,9 +54,13 @@ public class HbmItemDBStore implements Store<Item> {
      */
     @Override
     public Optional<Item> findById(int id) {
+        Optional<Item> result = Optional.empty();
         Session session = sf.openSession();
         session.beginTransaction();
-        Optional<Item> result = Optional.ofNullable(session.get(Item.class, id));
+        Item item = session.get(Item.class, id);
+        if (item != null) {
+            result = Optional.of(item);
+        }
         session.getTransaction().commit();
         session.close();
         return result;
@@ -75,14 +78,14 @@ public class HbmItemDBStore implements Store<Item> {
         boolean result = false;
         Session session = sf.openSession();
         session.beginTransaction();
-        item.setId(id);
-        session.update(item);
-        Optional<Item> updateItem = Optional.ofNullable(session.get(Item.class, item.getId()));
+        Item findItem = session.load(Item.class, id);
+        if (findItem != null) {
+            item.setId(id);
+            session.update(item);
+            result = true;
+        }
         session.getTransaction().commit();
         session.close();
-        if (updateItem.isPresent()) {
-            result = item.equals(updateItem.get());
-        }
         return result;
     }
 
@@ -94,14 +97,17 @@ public class HbmItemDBStore implements Store<Item> {
      */
     @Override
     public boolean delete(int id) {
+        boolean result = false;
         Session session = sf.openSession();
         session.beginTransaction();
-        int result = session.createQuery("delete from Item where id = :idItem")
-                .setParameter("idItem", id)
-                .executeUpdate();
+        Item item = session.load(Item.class, id);
+        if (item != null) {
+            session.delete(item);
+            result = true;
+        }
         session.getTransaction().commit();
         session.close();
-        return result > 0;
+        return result;
     }
 
     /**
