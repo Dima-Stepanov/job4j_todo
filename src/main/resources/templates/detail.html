@@ -1,0 +1,74 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>TODO list</title>
+</head>
+<body>
+<div class="container py-3">
+    <header th:insert="blocks/header :: header"></header>
+    <h2 class="display-6 text-center mb-4">Детали задания</h2>
+    <div class="container py-4">
+        <div class="p-5 mb-4 bg-light rounded-3">
+            <h3 class="display-5 fw-bold"><span th:text="${item.name}"/></h3>
+            <hr class="my-4">
+            <p class="col-md-8 fs-4">
+                ID задания: <span th:text="${item.id}"/>
+            </p>
+            <p class="col-md-8 fs-4">
+                Описание: <span th:text="${item.description}"/>
+            </p>
+            <p class="col-md-8 fs-4">
+                Дата создания: <span th:text="${item.getCreatedFormat()}"/>
+            </p>
+            <span th:if="${item.done!=null}">
+                    <p class="col-md-8 fs-4">
+                        Дата закрытия: <span th:text="${item.getDoneFormat()}"/>
+                    </p>
+            </span>
+            <div class="mb-2">
+            <span th:if="${item.done==null}">
+                <form th:action="@{/doneItem}" method="post" th:object="${item}">
+                    <input type="hidden" name="id" th:field="*{id}">
+                    <input type="hidden" name="name" th:field="*{name}">
+                    <input type="hidden" name="description" th:field="*{description}">
+                    <input type="hidden" name="created" th:field="*{created}">
+                        <button type="submit" value="doneItem" class="btn btn-lg btn-outline-primary">Выполнена</button>
+                </form>
+            </span>
+            </div>
+            <div class="mb-2">
+                <form th:action="@{|edit/${item.id}|}" method="get">
+                    <button value="editItem" type="submit" class="btn btn-lg btn-outline-primary">Редактировать
+                    </button>
+                </form>
+            </div>
+            <div class="mb-2">
+                <form th:action="@{/deleteItem}" method="post" th:object="${item}">
+                    <input type="hidden" name="id" th:field="*{id}">
+                    <button type="submit" value="deleteItem" class="btn btn-lg btn-outline-primary">Удалить</button>
+                </form>
+            </div>
+        </div>
+        <footer th:insert="blocks/footer :: footer"></footer>
+    </div>
+</div>
+</body>
+</html>

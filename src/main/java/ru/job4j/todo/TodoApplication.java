@@ -29,6 +29,13 @@ public class TodoApplication {
 
     }
 
+    /**
+     * Ловил ошибку.
+     * is in unnamed module of loader org.springframework.boot.devtools.restart.classloader.RestartClassLoader
+     * Исправил добавив System.setProperty("spring.devtools.restart.enabled", "false");
+     *
+     * @param args String[]
+     */
     public static void main(String[] args) {
         SpringApplication.run(TodoApplication.class, args);
         System.out.println("Go to http://localhost:8080/");
