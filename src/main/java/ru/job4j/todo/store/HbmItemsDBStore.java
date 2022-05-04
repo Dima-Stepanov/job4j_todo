@@ -21,10 +21,10 @@ import java.util.Optional;
  * @since 29.04.2022
  */
 @Repository
-public class HbmItemDBStore implements Store<Item> {
+public class HbmItemsDBStore implements Store<Item> {
     private final SessionFactory sf;
 
-    public HbmItemDBStore(SessionFactory sf) {
+    public HbmItemsDBStore(SessionFactory sf) {
         this.sf = sf;
     }
 

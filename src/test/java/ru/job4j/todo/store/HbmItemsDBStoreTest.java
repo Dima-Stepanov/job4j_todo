@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  * @author Dmitry Stepanov, user Dmitry
  * @since 29.04.2022
  */
-public class HbmItemDBStoreTest {
+public class HbmItemsDBStoreTest {
     static SessionFactory sf;
 
     @BeforeClass
@@ -53,7 +53,7 @@ public class HbmItemDBStoreTest {
     @Test
     public void whenCreateItem() {
         Item item = new Item("item");
-        HbmItemDBStore store = new HbmItemDBStore(sf);
+        HbmItemsDBStore store = new HbmItemsDBStore(sf);
         Optional<Item> result = store.create(item);
         assertThat(store.findById(item.getId()), is(result));
     }
@@ -61,7 +61,7 @@ public class HbmItemDBStoreTest {
     @Test
     public void whenFindByIdItemThenEmpty() {
         Item item = new Item("itemId");
-        HbmItemDBStore store = new HbmItemDBStore(sf);
+        HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         assertThat(Optional.empty(), is(store.findById(0)));
     }
@@ -69,7 +69,7 @@ public class HbmItemDBStoreTest {
     @Test
     public void whenFindByIdItemThenIsPresent() {
         Item item = new Item("itemId");
-        HbmItemDBStore store = new HbmItemDBStore(sf);
+        HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         assertThat(Optional.of(item), is(store.findById(item.getId())));
     }
@@ -77,7 +77,7 @@ public class HbmItemDBStoreTest {
     @Test
     public void whenUpdateItemThenTrue() {
         Item item = new Item("item");
-        HbmItemDBStore store = new HbmItemDBStore(sf);
+        HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         item.setName("updateItem");
         boolean result = store.update(item.getId(), item);
@@ -87,7 +87,7 @@ public class HbmItemDBStoreTest {
     @Test
     public void whenDeleteThenTrue() {
         Item item = new Item("item");
-        HbmItemDBStore store = new HbmItemDBStore(sf);
+        HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         boolean result = store.delete(item.getId());
         assertTrue(result);
@@ -98,7 +98,7 @@ public class HbmItemDBStoreTest {
         Item item = new Item("item");
         Item item1 = new Item("item1");
         item1.setDone(LocalDateTime.now());
-        HbmItemDBStore store = new HbmItemDBStore(sf);
+        HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         store.create(item1);
         List expected = List.of(item, item1);
@@ -114,7 +114,7 @@ public class HbmItemDBStoreTest {
         Item item3 = new Item("item3");
         item1.setDone(LocalDateTime.now());
         item3.setDone(LocalDateTime.now());
-        HbmItemDBStore store = new HbmItemDBStore(sf);
+        HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         store.create(item1);
         store.create(item2);
@@ -132,7 +132,7 @@ public class HbmItemDBStoreTest {
         Item item3 = new Item("item3");
         item1.setDone(LocalDateTime.now());
         item3.setDone(LocalDateTime.now());
-        HbmItemDBStore store = new HbmItemDBStore(sf);
+        HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         store.create(item1);
         store.create(item2);

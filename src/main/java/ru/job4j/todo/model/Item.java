@@ -21,13 +21,13 @@ import java.util.Objects;
 public class Item implements Comparable<Item>, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
     private int id;
-    @Column(name = "item_name", unique = true)
     private String name;
     private String description;
     private LocalDateTime created = LocalDateTime.now().withNano(0);
     private LocalDateTime done;
+    @Transient
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss");
 
     public Item() {
     }
@@ -95,7 +95,7 @@ public class Item implements Comparable<Item>, Serializable {
     }
 
     public String getCreatedFormat() {
-        return DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss").format(created);
+        return formatter.format(created);
     }
 
     public void setCreated(LocalDateTime created) {
@@ -107,7 +107,7 @@ public class Item implements Comparable<Item>, Serializable {
     }
 
     public String getDoneFormat() {
-        return DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss").format(done);
+        return formatter.format(done);
     }
 
     public void setDone(LocalDateTime done) {
@@ -135,8 +135,8 @@ public class Item implements Comparable<Item>, Serializable {
     public String toString() {
         return String.format("id: %s, name: %s, description: %s, create: %s, done %s",
                 id, name, description,
-                DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss").format(created),
-                DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss").format(done));
+                formatter.format(created),
+                formatter.format(done));
     }
 
     @Override

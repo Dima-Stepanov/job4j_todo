@@ -25,6 +25,12 @@
 <div class="container py-3">
     <header th:insert="blocks/header :: header"></header>
     <h2 class="display-6 text-center mb-4">Детали задания</h2>
+    <div th:if="${statusSuccess}" class="alert alert-success" role="alert">
+        Действие выполнена.
+    </div>
+    <div th:if="${statusErr}" class="alert alert-danger" role="alert">
+        Действие не выполнено.
+    </div>
     <div class="container py-4">
         <div class="p-5 mb-4 bg-light rounded-3">
             <h3 class="display-5 fw-bold"><span th:text="${item.name}"/></h3>
@@ -45,11 +51,8 @@
             </span>
             <div class="mb-2">
             <span th:if="${item.done==null}">
-                <form th:action="@{/doneItem}" method="post" th:object="${item}">
-                    <input type="hidden" name="id" th:field="*{id}">
-                    <input type="hidden" name="name" th:field="*{name}">
-                    <input type="hidden" name="description" th:field="*{description}">
-                    <input type="hidden" name="created" th:field="*{created}">
+                <form th:action="@{/doneItem}" method="post">
+                    <input type="hidden" name="id" th:field="*{item.id}">
                         <button type="submit" value="doneItem" class="btn btn-lg btn-outline-primary">Выполнена</button>
                 </form>
             </span>
@@ -61,8 +64,8 @@
                 </form>
             </div>
             <div class="mb-2">
-                <form th:action="@{/deleteItem}" method="post" th:object="${item}">
-                    <input type="hidden" name="id" th:field="*{id}">
+                <form th:action="@{/deleteItem}" method="post">
+                    <input type="hidden" name="id" th:field="*{item.id}">
                     <button type="submit" value="deleteItem" class="btn btn-lg btn-outline-primary">Удалить</button>
                 </form>
             </div>

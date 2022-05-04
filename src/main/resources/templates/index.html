@@ -27,6 +27,12 @@
     <header th:insert="blocks/header :: header"></header>
     <main>
         <h2 class="display-6 text-center mb-4"><span th:text="${pageName}"/></h2>
+        <div th:if="${statusSuccess}" class="alert alert-success" role="alert">
+            Действие выполнена.
+        </div>
+        <div th:if="${statusErr}" class="alert alert-danger" role="alert">
+            Действие не выполнено.
+        </div>
         <div class="table-responsive">
             <table class="table text-center">
                 <thead>

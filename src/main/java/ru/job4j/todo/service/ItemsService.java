@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.job4j.todo.model.Item;
 import ru.job4j.todo.store.Store;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,10 +19,10 @@ import java.util.Optional;
  * @since 01.05.2022
  */
 @Service
-public class ItemService {
+public class ItemsService {
     private final Store<Item> store;
 
-    public ItemService(Store<Item> store) {
+    public ItemsService(Store<Item> store) {
         this.store = store;
     }
 
@@ -54,6 +55,23 @@ public class ItemService {
      */
     public boolean updateItem(int id, Item item) {
         return store.update(id, item);
+    }
+
+    /**
+     * Закрытие задачи, установка времени закрытия задачи.
+     *
+     * @param id int
+     * @return String.
+     */
+    public boolean doneItem(int id) {
+        boolean result = false;
+        Optional<Item> item = store.findById(id);
+        if (item.isPresent()) {
+            item.get().setDone(LocalDateTime.now().withNano(0));
+            store.update(item.get().getId(), item.get());
+            result = true;
+        }
+        return result;
     }
 
     /**

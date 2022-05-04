@@ -4,9 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Item;
-import ru.job4j.todo.service.ItemService;
+import ru.job4j.todo.service.ItemsService;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -21,13 +20,13 @@ import java.util.Optional;
  */
 @Controller
 public class ItemsController {
-    private final ItemService service;
+    private final ItemsService service;
     private static final String ALL_ITEM = "Все задания";
     private static final String COMPLETED_ITEM = "Завершенные задания";
     private static final String NEW_ITEM = "Новые задания";
 
 
-    public ItemsController(ItemService service) {
+    public ItemsController(ItemsService service) {
         this.service = service;
     }
 
@@ -38,57 +37,66 @@ public class ItemsController {
      * @return "index".
      */
     @GetMapping("/")
-    public String index(Model model) {
+    public String index(Model model,
+                        @RequestParam(name = "statusSuccess", required = false) Boolean statusSuccess,
+                        @RequestParam(name = "statusErr", required = false) Boolean statusErr) {
+        model.addAttribute("statusSuccess", statusSuccess != null);
+        model.addAttribute("statusErr", statusErr != null);
         model.addAttribute("pageName", ALL_ITEM);
         model.addAttribute("items", service.findAllItem());
         return "index";
     }
 
     /**
-     * Отоброжение завершенных заданий.
+     * Отображение завершенных заданий.
      *
      * @param model Model.
      * @return "index".
      */
-    @GetMapping("/completedItem")
-    public String completedItem(Model model) {
+    @GetMapping("/doneItems")
+    public String doneItems(Model model) {
         model.addAttribute("pageName", COMPLETED_ITEM);
         model.addAttribute("items", service.findCompletedItem());
         return "index";
     }
 
     /**
-     * Отоброжение новых заданий.
+     * Отображение новых заданий.
      *
      * @param model Model.
      * @return "index"
      */
-    @GetMapping("/newItem")
-    public String newItem(Model model) {
+    @GetMapping("/newItems")
+    public String newItems(Model model) {
         model.addAttribute("pageName", NEW_ITEM);
         model.addAttribute("items", service.findNewItem());
         return "index";
     }
 
     /**
-     * Отоброжение деталей заданий.
+     * Отображение деталей заданий.
      *
      * @param model Model
      * @param id    int.
      * @return String.
      */
     @GetMapping("/detail/{id}")
-    public String detail(Model model, @PathVariable("id") int id) {
-        Optional<Item> itemFind = service.findByIdItem(id);
-        if (itemFind.isEmpty()) {
-            return "/";
+    public String detail(Model model,
+                         @PathVariable("id") int id,
+                         @RequestParam(name = "statusSuccess", required = false) Boolean statusSuccess,
+                         @RequestParam(name = "statusErr", required = false) Boolean statusErr) {
+        model.addAttribute("statusSuccess", statusSuccess != null);
+        model.addAttribute("statusErr", statusErr != null);
+        Optional<Item> item = service.findByIdItem(id);
+        if (item.isEmpty()) {
+            return "/?statusErr=true";
         }
-        model.addAttribute("item", service.findByIdItem(id).get());
+        model.addAttribute("item", item.get());
         return "detail";
     }
 
     /**
-     * Вызов вида new.html для добовления задания
+     * Вызов вида new.html для добавления задания
      *
      * @return String
      */
@@ -106,7 +114,10 @@ public class ItemsController {
     @PostMapping("/createItem")
     public String createItem(@ModelAttribute("item") Item item) {
         Optional<Item> result = service.add(item);
-        return "redirect:/detail/" + result.get().getId();
+        if (result.isEmpty()) {
+            return "redirect:/?statusErr=true";
+        }
+        return "redirect:/detail/" + result.get().getId() + "?statusSuccess=true";
     }
 
     /**
@@ -130,32 +141,37 @@ public class ItemsController {
      */
     @PostMapping("/editItem")
     public String editItem(@ModelAttribute("item") Item item) {
-        service.updateItem(item.getId(), item);
-        return "redirect:/detail/" + item.getId();
+        if (!service.updateItem(item.getId(), item)) {
+            return "redirect:/detail/" + item.getId() + "?statusErr=true";
+        }
+        return "redirect:/detail/" + item.getId() + "?statusSuccess=true";
     }
 
     /**
-     * Метод POST устонавливает дату закрытия задания.
+     * Метод POST устанавливает дату закрытия задания.
      *
-     * @param item Item
+     * @param id int
      * @return String
      */
     @PostMapping("/doneItem")
-    public String doneItem(@ModelAttribute("item") Item item) {
-        item.setDone(LocalDateTime.now().withNano(0));
-        service.updateItem(item.getId(), item);
-        return "redirect:/detail/" + item.getId();
+    public String doneItem(@ModelAttribute("id") int id) {
+        if (!service.doneItem(id)) {
+            return "redirect:/detail/" + id + "?statusErr=true";
+        }
+        return "redirect:/detail/" + id + "?statusSuccess=true";
     }
 
     /**
      * Метод POST удаление заявки.
      *
-     * @param item Item
+     * @param id int.
      * @return String
      */
     @PostMapping("/deleteItem")
-    public String deleteItem(@ModelAttribute("item") Item item) {
-        service.deleteItem(item.getId());
-        return "redirect:/";
+    public String deleteItem(@ModelAttribute("id") int id) {
+        if (!service.deleteItem(id)) {
+            return "redirect:/detail/" + id + "?statusErr=true";
+        }
+        return "redirect:/?statusSuccess=true";
     }
 }

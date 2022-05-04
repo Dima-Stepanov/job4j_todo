@@ -1,0 +1,11 @@
+﻿Вид запроса;Ссылка;Вид;Класс.имя метода обработчика;Описание
+GET;"""/""";index.html;ItemsController.index;все задания
+GET;"""/doneItems""";index.html;ItemsController.doneItems;завершенные задания
+GET;"""/newItems""";index.html;ItemsController.newItems;новые(незавершенные) задания
+GET;"""/detail:{id}""";detail.html;ItemsController.detail;детали задания
+GET;"""/new""";new.html;ItemsController.addItem;открытие формы нового задания
+POST;"""/createItem""";new.html;ItemsController.createItem;сохранение нового задания.
+GET;"""/detail/edit:{id}""";edit.html;ItemsController.edit;открытие формы редактирования задания
+POST;"""/editItem""";edit.html;ItemsController.editItem;сохранение редактированного задания.
+POST;"""/doneItem""";detail.html;ItemsController.doneItem;закрытие задания.
+POST;"""/deleteItem""";detail.html;ItemsController.deleteItem;удаление задания.
