@@ -8,12 +8,14 @@ import ru.job4j.todo.model.Item;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * 3. Мидл
  * 3.3. Hibernate
  * 3.3.1. Конфигурирование
  * 2. Создать TODO list [#3786]
+ * 3. Лямбды и шаблон wrapper. [#49295]
  * HdmItemDBStore хранилище в базе данных модели данных Item,
  * используется hibernate.
  *
@@ -30,44 +32,38 @@ public class HbmItemsDBStore implements Store<Item> {
 
     /**
      * Сохранение заявки.
+     * Применение шаблона WRAPPER.
      *
      * @param item Item
      * @return Optional<Item>
      */
     @Override
     public Optional<Item> create(Item item) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        session.save(item);
-        Optional<Item> result = Optional.of(session.load(Item.class, item.getId()));
-        Transaction tr = session.getTransaction();
-        tr.commit();
-        session.close();
-        return result;
+        return this.tx(
+                session -> {
+                    session.save(item);
+                    return Optional.ofNullable(session.get(Item.class, item.getId()));
+                }
+        );
     }
 
     /**
      * Поиск заявки по id
+     * Применение шаблона WRAPPER.
      *
      * @param id int
      * @return Optional<Item>
      */
     @Override
     public Optional<Item> findById(int id) {
-        Optional<Item> result = Optional.empty();
-        Session session = sf.openSession();
-        session.beginTransaction();
-        Item item = session.get(Item.class, id);
-        if (item != null) {
-            result = Optional.of(item);
-        }
-        session.getTransaction().commit();
-        session.close();
-        return result;
+        return this.tx(
+                session -> Optional.ofNullable(session.get(Item.class, id))
+        );
     }
 
     /**
      * Обновление заявки.
+     * Применение шаблона WRAPPER.
      *
      * @param id   int
      * @param item Item
@@ -75,86 +71,95 @@ public class HbmItemsDBStore implements Store<Item> {
      */
     @Override
     public boolean update(int id, Item item) {
-        boolean result = false;
-        Session session = sf.openSession();
-        session.beginTransaction();
-        Item findItem = session.load(Item.class, id);
-        if (findItem != null) {
-            item.setId(id);
-            session.update(item);
-            result = true;
-        }
-        session.getTransaction().commit();
-        session.close();
-        return result;
+        return this.tx(
+                session -> session.createQuery("update Item set name=:name, description=:description, "
+                                + "created=:created, done=:done where id=:id")
+                        .setParameter("id", id)
+                        .setParameter("name", item.getName())
+                        .setParameter("description", item.getDescription())
+                        .setParameter("created", item.getCreated())
+                        .setParameter("done", item.getDone())
+                        .executeUpdate() > 0
+        );
     }
 
     /**
      * Удаление заявки по id
+     * Применение шаблона WRAPPER.
      *
      * @param id int
      * @return boolean
      */
     @Override
     public boolean delete(int id) {
-        boolean result = false;
-        Session session = sf.openSession();
-        session.beginTransaction();
-        Item item = session.load(Item.class, id);
-        if (item != null) {
-            session.delete(item);
-            result = true;
-        }
-        session.getTransaction().commit();
-        session.close();
-        return result;
+        return this.tx(
+                session -> session.createQuery(
+                                "delete Item where id=:id")
+                        .setParameter("id", id).executeUpdate() > 0
+        );
     }
 
     /**
      * Поиск всех заявок.
+     * Применение шаблона WRAPPER.
      *
      * @return List
      */
     @Override
     public List<Item> findAll() {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        List result = session.createQuery("from Item")
-                .list();
-        session.getTransaction().commit();
-        session.close();
-        return result;
+        return this.tx(
+                session -> session.createQuery(
+                        "from Item").list()
+        );
     }
 
     /**
      * Поиск незавершенных заявок.
+     * Применение шаблона WRAPPER.
      *
      * @return List.
      */
     @Override
     public List<Item> findNew() {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        List result = session.createQuery("from Item  where done is null")
-                .list();
-        session.getTransaction().commit();
-        session.close();
-        return result;
+        return this.tx(
+                session -> session.createQuery(
+                        "from Item where done is null ").list()
+        );
     }
 
     /**
      * Поиск завершенных заявок.
+     * Применение шаблона WRAPPER.
      *
      * @return List.
      */
     @Override
     public List<Item> findCompleted() {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        List result = session.createQuery("from Item  where done is not null")
-                .list();
-        session.getTransaction().commit();
-        session.close();
-        return result;
+        return this.tx(
+                session -> session.createQuery(
+                        "from Item where done is not null").list()
+        );
+    }
+
+    /**
+     * Шаблон проектирования WRAPPER.
+     *
+     * @param command Function
+     * @param <T>
+     * @return
+     */
+    private <T> T tx(final Function<Session, T> command) {
+        final Session session = sf.openSession();
+        final Transaction tx = session.beginTransaction();
+        try {
+            T rsl = command.apply(session);
+            tx.commit();
+            return rsl;
+        } catch (final Exception e) {
+            session.getTransaction().rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 }

@@ -88,8 +88,8 @@ public class ItemsController {
         model.addAttribute("statusSuccess", statusSuccess != null);
         model.addAttribute("statusErr", statusErr != null);
         Optional<Item> item = service.findByIdItem(id);
-        if (item.isEmpty()) {
-            return "/?statusErr=true";
+        if (!item.isPresent()) {
+            return "redirect:/?statusErr=true";
         }
         model.addAttribute("item", item.get());
         return "detail";
@@ -114,7 +114,7 @@ public class ItemsController {
     @PostMapping("/createItem")
     public String createItem(@ModelAttribute("item") Item item) {
         Optional<Item> result = service.add(item);
-        if (result.isEmpty()) {
+        if (!result.isPresent()) {
             return "redirect:/?statusErr=true";
         }
         return "redirect:/detail/" + result.get().getId() + "?statusSuccess=true";
@@ -142,7 +142,7 @@ public class ItemsController {
     @PostMapping("/editItem")
     public String editItem(@ModelAttribute("item") Item item) {
         if (!service.updateItem(item.getId(), item)) {
-            return "redirect:/detail/" + item.getId() + "?statusErr=true";
+            return "redirect:/?statusErr=true";
         }
         return "redirect:/detail/" + item.getId() + "?statusSuccess=true";
     }
