@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 public interface Store<T> {
 
-    Optional<T> create(T type);
+    void create(T type);
 
     Optional<T> findById(int id);
 

@@ -104,7 +104,7 @@ public class ItemsControllerTest {
         String page = itemsController.detail(model, 2, false, false);
         verify(model).addAttribute("statusSuccess", true);
         verify(model).addAttribute("statusErr", true);
-        assertThat(page, is("/?statusErr=true"));
+        assertThat(page, is("redirect:/?statusErr=true"));
     }
 
     @Test
@@ -123,22 +123,9 @@ public class ItemsControllerTest {
                 LocalDateTime.now().withNano(0), null);
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
-        when(itemsService.add(item)).thenReturn(Optional.of(item));
         ItemsController itemsController = new ItemsController(itemsService);
         String page = itemsController.createItem(item);
         assertThat(page, is("redirect:/detail/" + item.getId() + "?statusSuccess=true"));
-    }
-
-    @Test
-    public void whenCreateItemPOSTErr() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
-        Model model = mock(Model.class);
-        ItemsService itemsService = mock(ItemsService.class);
-        when(itemsService.add(item)).thenReturn(Optional.empty());
-        ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.createItem(item);
-        assertThat(page, is("redirect:/?statusErr=true"));
     }
 
     @Test
@@ -175,7 +162,7 @@ public class ItemsControllerTest {
         when(itemsService.updateItem(item.getId(), item)).thenReturn(false);
         ItemsController itemsController = new ItemsController(itemsService);
         String page = itemsController.editItem(item);
-        assertThat(page, is("redirect:/detail/" + item.getId() + "?statusErr=true"));
+        assertThat(page, is("redirect:/?statusErr=true"));
     }
 
     @Test

@@ -113,11 +113,8 @@ public class ItemsController {
      */
     @PostMapping("/createItem")
     public String createItem(@ModelAttribute("item") Item item) {
-        Optional<Item> result = service.add(item);
-        if (!result.isPresent()) {
-            return "redirect:/?statusErr=true";
-        }
-        return "redirect:/detail/" + result.get().getId() + "?statusSuccess=true";
+        service.add(item);
+        return "redirect:/detail/" + item.getId() + "?statusSuccess=true";
     }
 
     /**

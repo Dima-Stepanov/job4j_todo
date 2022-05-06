@@ -54,8 +54,8 @@ public class HbmItemsDBStoreTest {
     public void whenCreateItem() {
         Item item = new Item("item");
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
-        Optional<Item> result = store.create(item);
-        assertThat(store.findById(item.getId()), is(result));
+        store.create(item);
+        assertThat(store.findById(item.getId()).get(), is(item));
     }
 
     @Test

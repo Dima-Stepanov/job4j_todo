@@ -32,8 +32,8 @@ public class ItemsService {
      * @param item Item.
      * @return Optional.
      */
-    public Optional<Item> add(Item item) {
-        return store.create(item);
+    public void add(Item item) {
+        store.create(item);
     }
 
     /**

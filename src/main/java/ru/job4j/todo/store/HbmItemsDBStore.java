@@ -38,13 +38,8 @@ public class HbmItemsDBStore implements Store<Item> {
      * @return Optional<Item>
      */
     @Override
-    public Optional<Item> create(Item item) {
-        return this.tx(
-                session -> {
-                    session.save(item);
-                    return Optional.ofNullable(session.get(Item.class, item.getId()));
-                }
-        );
+    public void create(Item item) {
+        this.tx(session -> session.save(item));
     }
 
     /**
@@ -123,7 +118,7 @@ public class HbmItemsDBStore implements Store<Item> {
     public List<Item> findNew() {
         return this.tx(
                 session -> session.createQuery(
-                        "from Item where done is null ").list()
+                        "from Item where done is null").list()
         );
     }
 
