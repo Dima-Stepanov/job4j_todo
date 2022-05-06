@@ -12,6 +12,9 @@ import java.util.Objects;
  * 3.3.1. Конфигурирование
  * 2. Создать TODO list [#3786]
  * Item модель данных.
+ * 3.3.2. Mapping
+ * 0. ToOne [#6873]
+ * Отношение ManyToOn Item->User.
  *
  * @author Dmitry Stepanov, user Dmitry
  * @since 29.04.2022
@@ -26,44 +29,18 @@ public class Item implements Comparable<Item>, Serializable {
     private String description;
     private LocalDateTime created = LocalDateTime.now().withNano(0);
     private LocalDateTime done;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     @Transient
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss");
 
-    public Item() {
-    }
-
-    public Item(int id) {
-        this.id = id;
-    }
-
-    public Item(String name) {
-        this.name = name;
-    }
-
-    public Item(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Item(int id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
-
-    public Item(int id, String name, String description, LocalDateTime created, LocalDateTime done) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.created = created;
-        this.done = done;
-    }
-
-    public Item(String name, String description, LocalDateTime created, LocalDateTime done) {
-        this.name = name;
-        this.description = description;
-        this.created = created;
-        this.done = done;
+    public static Item of(String name, String description, User user) {
+        Item item = new Item();
+        item.name = name;
+        item.description = description;
+        item.user = user;
+        return item;
     }
 
     public int getId() {
@@ -112,6 +89,14 @@ public class Item implements Comparable<Item>, Serializable {
 
     public void setDone(LocalDateTime done) {
         this.done = done;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

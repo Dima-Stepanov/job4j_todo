@@ -16,7 +16,7 @@ import java.util.function.Function;
  * 3.3.1. Конфигурирование
  * 2. Создать TODO list [#3786]
  * 3. Лямбды и шаблон wrapper. [#49295]
- * HdmItemDBStore хранилище в базе данных модели данных Item,
+ * HdmItemsDBStore хранилище в базе данных модели данных Item,
  * используется hibernate.
  *
  * @author Dmitry Stepanov, user Dmitry
@@ -26,7 +26,7 @@ import java.util.function.Function;
 public class HbmItemsDBStore implements Store<Item> {
     private final SessionFactory sf;
 
-    public HbmItemsDBStore(SessionFactory sf) {
+    public HbmItemsDBStore(final SessionFactory sf) {
         this.sf = sf;
     }
 
@@ -38,8 +38,8 @@ public class HbmItemsDBStore implements Store<Item> {
      * @return Optional<Item>
      */
     @Override
-    public void create(Item item) {
-        this.tx(session -> session.save(item));
+    public boolean create(Item item) {
+        return this.tx(session -> session.save(item)) != null;
     }
 
     /**

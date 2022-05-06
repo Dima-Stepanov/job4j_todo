@@ -3,6 +3,7 @@ package ru.job4j.todo.controller;
 import org.junit.Test;
 import org.springframework.ui.Model;
 import ru.job4j.todo.model.Item;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.ItemsService;
 
 import java.time.LocalDateTime;
@@ -31,12 +32,16 @@ public class ItemsControllerTest {
 
     @Test
     public void whenIndexGET() {
-        List<Item> items = Arrays.asList(
-                new Item(1, "Item1", "desc Item1",
-                        LocalDateTime.now().withNano(0).minusDays(5),
-                        LocalDateTime.now().withNano(0)),
-                new Item(2, "Item 2", "desc Item2",
-                        LocalDateTime.now().withNano(0).minusDays(10), null));
+        User user1 = User.of("User", "pass");
+        Item item1 = Item.of("Item1", "desc Item1", user1);
+        item1.setId(1);
+        item1.setCreated(LocalDateTime.now().withNano(0).minusDays(5));
+        item1.setDone(LocalDateTime.now().withNano(0));
+        User user2 = User.of("User2", "pass2");
+        Item item2 = Item.of("Item1", "desc Item1", user2);
+        item2.setId(2);
+        item2.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        List<Item> items = Arrays.asList(item1, item2);
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findAllItem()).thenReturn(items);
@@ -51,10 +56,12 @@ public class ItemsControllerTest {
 
     @Test
     public void whenDoneItemsGET() {
-        List<Item> items = Arrays.asList(
-                new Item(1, "Item1", "desc Item1",
-                        LocalDateTime.now().withNano(0).minusDays(5),
-                        LocalDateTime.now().withNano(0)));
+        User user1 = User.of("User", "pass");
+        Item item1 = Item.of("Item1", "desc Item1", user1);
+        item1.setId(1);
+        item1.setCreated(LocalDateTime.now().withNano(0).minusDays(5));
+        item1.setDone(LocalDateTime.now().withNano(0));
+        List<Item> items = Arrays.asList(item1);
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findCompletedItem()).thenReturn(items);
@@ -67,9 +74,11 @@ public class ItemsControllerTest {
 
     @Test
     public void whenNewItemsGET() {
-        List<Item> items = Arrays.asList(
-                new Item(2, "Item 2", "desc Item2",
-                        LocalDateTime.now().withNano(0).minusDays(10), null));
+        User user2 = User.of("User2", "pass2");
+        Item item2 = Item.of("Item1", "desc Item1", user2);
+        item2.setId(2);
+        item2.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        List<Item> items = Arrays.asList(item2);
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findNewItem()).thenReturn(items);
@@ -82,8 +91,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenDetailGET() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0).minusDays(10), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findByIdItem(item.getId())).thenReturn(Optional.of(item));
@@ -119,8 +130,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenCreateItemPOST() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         ItemsController itemsController = new ItemsController(itemsService);
@@ -130,8 +143,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenEditGET() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findByIdItem(item.getId())).thenReturn(Optional.of(item));
@@ -143,8 +158,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenEditItemPOST() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.updateItem(item.getId(), item)).thenReturn(true);
@@ -155,8 +172,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenEditItemPOSTErr() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.updateItem(item.getId(), item)).thenReturn(false);
@@ -167,8 +186,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenDoneItemPOST() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.doneItem(item.getId())).thenReturn(true);
@@ -179,8 +200,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenDoneItemPOSTErr() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.doneItem(item.getId())).thenReturn(false);
@@ -191,8 +214,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenDeleteItemPOST() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.deleteItem(item.getId())).thenReturn(true);
@@ -203,8 +228,10 @@ public class ItemsControllerTest {
 
     @Test
     public void whenDeleteItemPOSTErr() {
-        Item item = new Item(2, "Item 2", "desc Item2",
-                LocalDateTime.now().withNano(0), null);
+        User user = User.of("User2", "pass2");
+        Item item = Item.of("Item1", "desc Item1", user);
+        item.setId(2);
+        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.deleteItem(item.getId())).thenReturn(false);
