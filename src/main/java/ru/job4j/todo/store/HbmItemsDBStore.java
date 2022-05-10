@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Item;
+import ru.job4j.todo.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ import java.util.function.Function;
  * @since 29.04.2022
  */
 @Repository
-public class HbmItemsDBStore implements Store<Item> {
+public class HbmItemsDBStore implements Store<Item, User> {
     private final SessionFactory sf;
 
     public HbmItemsDBStore(final SessionFactory sf) {
@@ -35,11 +36,10 @@ public class HbmItemsDBStore implements Store<Item> {
      * Применение шаблона WRAPPER.
      *
      * @param item Item
-     * @return Optional<Item>
      */
     @Override
-    public boolean create(Item item) {
-        return this.tx(session -> session.save(item)) != null;
+    public void create(final Item item) {
+        this.tx(session -> session.save(item));
     }
 
     /**
@@ -65,7 +65,7 @@ public class HbmItemsDBStore implements Store<Item> {
      * @return boolean
      */
     @Override
-    public boolean update(int id, Item item) {
+    public boolean update(int id, final Item item) {
         return this.tx(
                 session -> session.createQuery("update Item set name=:name, description=:description, "
                                 + "created=:created, done=:done where id=:id")
@@ -88,9 +88,9 @@ public class HbmItemsDBStore implements Store<Item> {
     @Override
     public boolean delete(int id) {
         return this.tx(
-                session -> session.createQuery(
-                                "delete Item where id=:id")
-                        .setParameter("id", id).executeUpdate() > 0
+                session -> session.createQuery("delete Item where id=:id")
+                        .setParameter("id", id)
+                        .executeUpdate() > 0
         );
     }
 
@@ -101,10 +101,11 @@ public class HbmItemsDBStore implements Store<Item> {
      * @return List
      */
     @Override
-    public List<Item> findAll() {
+    public List<Item> findAll(final User user) {
         return this.tx(
-                session -> session.createQuery(
-                        "from Item").list()
+                session -> session
+                        .createQuery("from Item where user=:user")
+                        .setParameter("user", user).list()
         );
     }
 
@@ -115,10 +116,11 @@ public class HbmItemsDBStore implements Store<Item> {
      * @return List.
      */
     @Override
-    public List<Item> findNew() {
+    public List<Item> findNew(final User user) {
         return this.tx(
-                session -> session.createQuery(
-                        "from Item where done is null").list()
+                session -> session
+                        .createQuery("from Item where user=:user and done is null")
+                        .setParameter("user", user).list()
         );
     }
 
@@ -129,10 +131,11 @@ public class HbmItemsDBStore implements Store<Item> {
      * @return List.
      */
     @Override
-    public List<Item> findCompleted() {
+    public List<Item> findDone(final User user) {
         return this.tx(
-                session -> session.createQuery(
-                        "from Item where done is not null").list()
+                session -> session
+                        .createQuery("from Item where user=:user and done is not null")
+                        .setParameter("user", user).list()
         );
     }
 
@@ -140,8 +143,8 @@ public class HbmItemsDBStore implements Store<Item> {
      * Шаблон проектирования WRAPPER.
      *
      * @param command Function
-     * @param <T>
-     * @return
+     * @param <T> T
+     * @return T
      */
     private <T> T tx(final Function<Session, T> command) {
         final Session session = sf.openSession();

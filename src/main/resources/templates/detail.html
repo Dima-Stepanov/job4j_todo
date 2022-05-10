@@ -36,6 +36,9 @@
             <h3 class="display-5 fw-bold"><span th:text="${item.name}"/></h3>
             <hr class="my-4">
             <p class="col-md-8 fs-4">
+                Автор: <span th:text="${item.getUser().name}"/>
+            </p>
+            <p class="col-md-8 fs-4">
                 ID задания: <span th:text="${item.id}"/>
             </p>
             <p class="col-md-8 fs-4">
@@ -58,7 +61,8 @@
             </span>
             </div>
             <div class="mb-2">
-                <form th:action="@{|edit/${item.id}|}" method="get">
+                <form th:action="@{/edit}" method="get" th:object="${item}">
+                    <input type="hidden" name="id" th:field="*{id}">
                     <button value="editItem" type="submit" class="btn btn-lg btn-outline-primary">Редактировать
                     </button>
                 </form>

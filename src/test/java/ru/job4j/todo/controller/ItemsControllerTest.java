@@ -6,6 +6,7 @@ import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.ItemsService;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -32,25 +33,27 @@ public class ItemsControllerTest {
 
     @Test
     public void whenIndexGET() {
-        User user1 = User.of("User", "pass");
-        Item item1 = Item.of("Item1", "desc Item1", user1);
+        User user = User.of("User", "pass");
+        Item item1 = Item.of("Item1", "desc Item1", user);
         item1.setId(1);
         item1.setCreated(LocalDateTime.now().withNano(0).minusDays(5));
         item1.setDone(LocalDateTime.now().withNano(0));
-        User user2 = User.of("User2", "pass2");
-        Item item2 = Item.of("Item1", "desc Item1", user2);
+        Item item2 = Item.of("Item1", "desc Item1", user);
         item2.setId(2);
         item2.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
         List<Item> items = Arrays.asList(item1, item2);
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
-        when(itemsService.findAllItem()).thenReturn(items);
+        when(itemsService.findAllItem(user)).thenReturn(items);
         ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.index(model, false, false);
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user);
+        String page = itemsController.index(model, false, false, session);
         verify(model).addAttribute("statusSuccess", true);
         verify(model).addAttribute("statusErr", true);
         verify(model).addAttribute("pageName", ALL_ITEM);
         verify(model).addAttribute("items", items);
+        verify(model).addAttribute("user", user);
         assertThat(page, is("index"));
     }
 
@@ -64,11 +67,14 @@ public class ItemsControllerTest {
         List<Item> items = Arrays.asList(item1);
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
-        when(itemsService.findCompletedItem()).thenReturn(items);
+        when(itemsService.findDoneItem(user1)).thenReturn(items);
         ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.doneItems(model);
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user1);
+        String page = itemsController.doneItems(model, session);
         verify(model).addAttribute("pageName", COMPLETED_ITEM);
         verify(model).addAttribute("items", items);
+        verify(model).addAttribute("user", user1);
         assertThat(page, is("index"));
     }
 
@@ -81,11 +87,14 @@ public class ItemsControllerTest {
         List<Item> items = Arrays.asList(item2);
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
-        when(itemsService.findNewItem()).thenReturn(items);
+        when(itemsService.findNewItem(user2)).thenReturn(items);
         ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.newItems(model);
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user2);
+        String page = itemsController.newItems(model, session);
         verify(model).addAttribute("pageName", NEW_ITEM);
         verify(model).addAttribute("items", items);
+        verify(model).addAttribute("user", user2);
         assertThat(page, is("index"));
     }
 
@@ -99,32 +108,39 @@ public class ItemsControllerTest {
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findByIdItem(item.getId())).thenReturn(Optional.of(item));
         ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.detail(model, 2, false, false);
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user);
+        String page = itemsController.detail(model, 2, false, false, session);
         verify(model).addAttribute("statusSuccess", true);
         verify(model).addAttribute("statusErr", true);
         verify(model).addAttribute("item", item);
+        verify(model).addAttribute("user", user);
         assertThat(page, is("detail"));
     }
 
     @Test
     public void whenDetailErrGET() {
+        User user = User.of("Гость", "");
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findByIdItem(2)).thenReturn(Optional.empty());
         ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.detail(model, 2, false, false);
-        verify(model).addAttribute("statusSuccess", true);
-        verify(model).addAttribute("statusErr", true);
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user);
+        String page = itemsController.detail(model, 2, false, false, session);
         assertThat(page, is("redirect:/?statusErr=true"));
     }
 
     @Test
     public void whenAddItemGET() {
-        Item item = new Item();
+        User user = User.of("Гость", "");
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.addItem(item);
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user);
+        String page = itemsController.addItem(model, session);
+        verify(model).addAttribute("user", user);
         assertThat(page, is("new"));
     }
 
@@ -137,7 +153,9 @@ public class ItemsControllerTest {
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.createItem(item);
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user);
+        String page = itemsController.createItem(item, session);
         assertThat(page, is("redirect:/detail/" + item.getId() + "?statusSuccess=true"));
     }
 
@@ -151,8 +169,11 @@ public class ItemsControllerTest {
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findByIdItem(item.getId())).thenReturn(Optional.of(item));
         ItemsController itemsController = new ItemsController(itemsService);
-        String page = itemsController.edit(model, item.getId());
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user);
+        String page = itemsController.edit(model, item, session);
         verify(model).addAttribute("item", item);
+        verify(model).addAttribute("user", user);
         assertThat(page, is("edit"));
     }
 
