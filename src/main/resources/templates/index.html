@@ -38,6 +38,7 @@
                 <thead>
                 <tr>
                     <th style="width: 22%;">Имя задания</th>
+                    <th style="width: 22%;">Автор</th>
                     <th style="width: 22%;">Дата создания</th>
                     <th style="width: 22%;">Состояние</th>
                 </tr>
@@ -45,11 +46,12 @@
                 <tbody>
                 <tr th:each="item: ${items}">
                     <th scope="row" class="text-start">
-                        <a th:href="@{|detail/${item.id}|}">
+                        <a th:href="@{/detail/{id}(id=${item.id})}">
                             <i class="fa fa-edit"></i>
                         </a>
                         <span th:text="${item.name}"></span>
                     </th>
+                    <td th:text="${item.getUser().getName()}"/>
                     <td th:text="${item.getCreatedFormat()}"/>
                     <td>
                         <span th:if="${item.done!=null}">
@@ -67,7 +69,9 @@
             <div class="col">
                 <div class="card mb-4 rounded-3 shadow-sm">
                     <form th:action="@{/new}" method="get">
-                        <button type="submit" value="createItem" class="w-100 btn btn-lg btn-outline-primary">Добавить задание</button>
+                        <button type="submit" value="createItem" class="w-100 btn btn-lg btn-outline-primary">Добавить
+                            задание
+                        </button>
                     </form>
                 </div>
             </div>

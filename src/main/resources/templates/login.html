@@ -24,28 +24,31 @@
 <body>
 <div class="container py-3">
     <header th:insert="blocks/header :: header"></header>
-    <h2 class="display-6 text-center mb-4">Редактирование задания</h2>
-    <hr class="my-4">
-    <form th:action="@{/editItem}" method="post" th:object="${item}">
-        <input type="hidden" name="id" th:field="*{id}">
-        <div class="row g-3">
-            <div class="col-sm-6">
-                <label for="name" class="form-label">Имя задания</label>
-                <input type="text" class="form-control" name="name" id="name"
-                       th:value="*{name}">
-            </div>
-            <div class="col-12">
-                <label for="description" class="form-label">Описание задания</label>
-                <div class="input-group has-validation">
-                    <input type="text" class="form-control" name="description" id="description"
-                           th:value="*{description}">
-                </div>
-            </div>
+    <main class="form-signin">
+        <h1 class="h3 mb-3 fw-normal">Авторизация</h1>
+        <div th:if="${userErr}" class="alert alert-danger" role="alert">
+            Логин или проль введены неверно
         </div>
-        <div class="my-4">
-            <button value="editItem" type="submit" class="w-100 btn btn-primary btn-lg">Сохранить</button>
-        </div>
-    </form>
+        <form th:action="@{login}" method="post" th:object="${user}">
+            <div class="form-floating mb-3">
+                <label for="name">Имя пользователя</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Имя пользователя">
+            </div>
+            <div class="form-floating mb-3">
+                <label for="password">Пароль</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Пароль">
+            </div>
+            <div class="checkbox mb-3">
+                <label>
+                    <a th:href="@{newUser}">
+                        <i class="fa fa-edit">Регистрация</i>
+                    </a>
+                </label>
+            </div>
+            </span>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Авторизация</button>
+        </form>
+    </main>
     <footer th:insert="blocks/footer :: footer"></footer>
 </div>
 </body>

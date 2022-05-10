@@ -47,21 +47,28 @@ public class HbmItemsDBStoreTest {
         Session session = sf.openSession();
         session.beginTransaction();
         session.createQuery("delete Item").executeUpdate();
+        session.createQuery("delete User").executeUpdate();
         session.getTransaction().commit();
         session.close();
     }
 
     @Test
     public void whenCreateItem() {
-        Item item = Item.of("item", "desc Item", User.of("user", "pass"));
-        HbmItemsDBStore store = new HbmItemsDBStore(sf);
-        store.create(item);
-        assertThat(store.findById(item.getId()).get(), is(item));
+        User user = User.of("user", "pass");
+        HbmUsersDBStore userStore = new HbmUsersDBStore(sf);
+        userStore.create(user);
+        Item item = Item.of("item", "desc Item", user);
+        HbmItemsDBStore itemStore = new HbmItemsDBStore(sf);
+        itemStore.create(item);
+        assertThat(itemStore.findById(item.getId()).get(), is(item));
     }
 
     @Test
     public void whenFindByIdItemThenEmpty() {
-        Item item = Item.of("item", "desc Item", User.of("user", "pass"));
+        User user = User.of("user", "pass");
+        HbmUsersDBStore userStore = new HbmUsersDBStore(sf);
+        userStore.create(user);
+        Item item = Item.of("item", "desc Item", user);
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         assertThat(Optional.empty(), is(store.findById(0)));
@@ -69,7 +76,10 @@ public class HbmItemsDBStoreTest {
 
     @Test
     public void whenFindByIdItemThenIsPresent() {
-        Item item = Item.of("item", "desc Item", User.of("user", "pass"));
+        User user = User.of("user", "pass");
+        HbmUsersDBStore userStore = new HbmUsersDBStore(sf);
+        userStore.create(user);
+        Item item = Item.of("item", "desc Item", user);
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         assertThat(Optional.of(item), is(store.findById(item.getId())));
@@ -77,7 +87,10 @@ public class HbmItemsDBStoreTest {
 
     @Test
     public void whenUpdateItemThenTrue() {
-        Item item = Item.of("item", "desc Item", User.of("user", "pass"));
+        User user = User.of("user", "pass");
+        HbmUsersDBStore userStore = new HbmUsersDBStore(sf);
+        userStore.create(user);
+        Item item = Item.of("item", "desc Item", user);
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         item.setName("updateItem");
@@ -87,7 +100,10 @@ public class HbmItemsDBStoreTest {
 
     @Test
     public void whenDeleteThenTrue() {
-        Item item = Item.of("item", "desc Item", User.of("user", "pass"));
+        User user = User.of("user", "pass");
+        HbmUsersDBStore userStore = new HbmUsersDBStore(sf);
+        userStore.create(user);
+        Item item = Item.of("item", "desc Item", user);
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         boolean result = store.delete(item.getId());
@@ -96,23 +112,29 @@ public class HbmItemsDBStoreTest {
 
     @Test
     public void whenFindAllItem() {
-        Item item = Item.of("item", "desc Item", User.of("user", "pass"));
-        Item item1 = Item.of("item1", "desc Item1", User.of("user1", "pass1"));
+        User user = User.of("user", "pass");
+        HbmUsersDBStore userStore = new HbmUsersDBStore(sf);
+        userStore.create(user);
+        Item item = Item.of("item", "desc Item", user);
+        Item item1 = Item.of("item1", "desc Item1", user);
         item1.setDone(LocalDateTime.now());
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         store.create(item1);
         List expected = List.of(item, item1);
-        List result = store.findAll();
+        List result = store.findAll(user);
         assertThat(expected.toArray(), is(result.toArray()));
     }
 
     @Test
     public void whenFindNewItem() {
-        Item item = Item.of("item", "desc Item", User.of("user", "pass"));
-        Item item1 = Item.of("item", "desc Item", User.of("user1", "pass1"));
-        Item item2 = Item.of("item", "desc Item", User.of("user2", "pass2"));
-        Item item3 = Item.of("item", "desc Item", User.of("user3", "pass3"));
+        User user = User.of("user", "pass");
+        HbmUsersDBStore userStore = new HbmUsersDBStore(sf);
+        userStore.create(user);
+        Item item = Item.of("item", "desc Item", user);
+        Item item1 = Item.of("item", "desc Item", user);
+        Item item2 = Item.of("item", "desc Item", user);
+        Item item3 = Item.of("item", "desc Item", user);
         item1.setDone(LocalDateTime.now());
         item3.setDone(LocalDateTime.now());
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
@@ -121,16 +143,19 @@ public class HbmItemsDBStoreTest {
         store.create(item2);
         store.create(item3);
         List expected = List.of(item, item2);
-        List result = store.findNew();
+        List result = store.findNew(user);
         assertThat(expected.toArray(), is(result.toArray()));
     }
 
     @Test
-    public void whenFindCompletedItem() {
-        Item item = Item.of("item", "desc Item", User.of("user", "pass"));
-        Item item1 = Item.of("item", "desc Item", User.of("user1", "pass1"));
-        Item item2 = Item.of("item", "desc Item", User.of("user2", "pass2"));
-        Item item3 = Item.of("item", "desc Item", User.of("user3", "pass3"));
+    public void whenFindDoneItem() {
+        User user = User.of("user", "pass");
+        HbmUsersDBStore userStore = new HbmUsersDBStore(sf);
+        userStore.create(user);
+        Item item = Item.of("item", "desc Item", user);
+        Item item1 = Item.of("item", "desc Item", user);
+        Item item2 = Item.of("item", "desc Item", user);
+        Item item3 = Item.of("item", "desc Item", user);
         item1.setDone(LocalDateTime.now());
         item3.setDone(LocalDateTime.now());
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
@@ -139,7 +164,7 @@ public class HbmItemsDBStoreTest {
         store.create(item2);
         store.create(item3);
         List expected = List.of(item1, item3);
-        List result = store.findCompleted();
+        List result = store.findDone(user);
         assertThat(expected.toArray(), is(result.toArray()));
     }
 }

@@ -1,11 +1,20 @@
-﻿Вид запроса;Ссылка;Вид;Класс.имя метода обработчика;Описание
-GET;"""/""";index.html;ItemsController.index;все задания
-GET;"""/doneItems""";index.html;ItemsController.doneItems;завершенные задания
-GET;"""/newItems""";index.html;ItemsController.newItems;новые(незавершенные) задания
-GET;"""/detail:{id}""";detail.html;ItemsController.detail;детали задания
-GET;"""/new""";new.html;ItemsController.addItem;открытие формы нового задания
-POST;"""/createItem""";new.html;ItemsController.createItem;сохранение нового задания.
-GET;"""/detail/edit:{id}""";edit.html;ItemsController.edit;открытие формы редактирования задания
-POST;"""/editItem""";edit.html;ItemsController.editItem;сохранение редактированного задания.
-POST;"""/doneItem""";detail.html;ItemsController.doneItem;закрытие задания.
-POST;"""/deleteItem""";detail.html;ItemsController.deleteItem;удаление задания.
+84 70?@>A0;!AK;:0;84;;0AA.8<O <5B>40 >1@01>BG8:0;?8A0=85
+Item;;;;
+GET;"""/""";index.html;ItemsController.index;2A5 7040=8O
+GET;"""/doneItems""";index.html;ItemsController.doneItems;7025@H5==K5 7040=8O
+GET;"""/newItems""";index.html;ItemsController.newItems;=>2K5(=57025@H5==K5) 7040=8O
+GET;"""/detail:{id}""";detail.html;ItemsController.detail;45B0;8 7040=8O
+GET;"""/new""";new.html;ItemsController.addItem;>B:@KB85 D>@<K =>2>3> 7040=8O
+POST;"""/createItem""";new.html;ItemsController.createItem;A>E@0=5=85 =>2>3> 7040=8O.
+GET;"""/edit:{Item}""";edit.html;ItemsController.edit;>B:@KB85 D>@<K @540:B8@>20=8O 7040=8O
+POST;"""/editItem""";edit.html;ItemsController.editItem;A>E@0=5=85 @540:B8@>20==>3> 7040=8O.
+POST;"""/doneItem""";detail.html;ItemsController.doneItem;70:@KB85 7040=8O.
+POST;"""/deleteItem""";detail.html;ItemsController.deleteItem;C40;5=85 7040=8O.
+User;;;;
+GET;"""/login""";login.html;UsersController.login;284 02B>@870F88
+POST;"""/login""";login.html;UsersController.loginPost;02B>@870F8O
+GET;"""/newUser""";newUser.html;UsersController.createUser;284 @538AB@0F88
+POST;"""/newUser""";newUser.html;UsersController.createUserPost;@538AB@0F88
+GET;"""/editUser""";editUser.html;UsersController.editUser;284 @540:B8@>20=8O
+POST;"""/editUser""";editUser.html;UsersController.editUserPost;@540:B8@>20=8O
+GET;"""/logout""";login.html;UsersController.logout;2KE>4 ?>;L7>20B5;O

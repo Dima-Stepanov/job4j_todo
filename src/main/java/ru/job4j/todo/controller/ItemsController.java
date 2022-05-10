@@ -4,8 +4,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Item;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.ItemsService;
 
+import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 /**
@@ -25,7 +27,6 @@ public class ItemsController {
     private static final String COMPLETED_ITEM = "Завершенные задания";
     private static final String NEW_ITEM = "Новые задания";
 
-
     public ItemsController(ItemsService service) {
         this.service = service;
     }
@@ -39,11 +40,14 @@ public class ItemsController {
     @GetMapping("/")
     public String index(Model model,
                         @RequestParam(name = "statusSuccess", required = false) Boolean statusSuccess,
-                        @RequestParam(name = "statusErr", required = false) Boolean statusErr) {
+                        @RequestParam(name = "statusErr", required = false) Boolean statusErr,
+                        HttpSession session) {
+        User user = getUserSession(session);
+        model.addAttribute("user", user);
         model.addAttribute("statusSuccess", statusSuccess != null);
         model.addAttribute("statusErr", statusErr != null);
         model.addAttribute("pageName", ALL_ITEM);
-        model.addAttribute("items", service.findAllItem());
+        model.addAttribute("items", service.findAllItem(user));
         return "index";
     }
 
@@ -54,54 +58,69 @@ public class ItemsController {
      * @return "index".
      */
     @GetMapping("/doneItems")
-    public String doneItems(Model model) {
+    public String doneItems(Model model, HttpSession session) {
+        User user = getUserSession(session);
+        model.addAttribute("user", user);
         model.addAttribute("pageName", COMPLETED_ITEM);
-        model.addAttribute("items", service.findCompletedItem());
+        model.addAttribute("items", service.findDoneItem(user));
         return "index";
     }
 
     /**
      * Отображение новых заданий.
      *
-     * @param model Model.
-     * @return "index"
+     * @param model   Model.
+     * @param session HttpSession
+     * @return String.
      */
     @GetMapping("/newItems")
-    public String newItems(Model model) {
+    public String newItems(Model model, HttpSession session) {
+        User user = getUserSession(session);
+        model.addAttribute("user", user);
         model.addAttribute("pageName", NEW_ITEM);
-        model.addAttribute("items", service.findNewItem());
+        model.addAttribute("items", service.findNewItem(user));
         return "index";
     }
 
     /**
      * Отображение деталей заданий.
      *
-     * @param model Model
-     * @param id    int.
+     * @param model         Model
+     * @param id            int
+     * @param statusSuccess Boolean
+     * @param statusErr     Boolean
+     * @param session       HttpSession
      * @return String.
      */
     @GetMapping("/detail/{id}")
     public String detail(Model model,
                          @PathVariable("id") int id,
                          @RequestParam(name = "statusSuccess", required = false) Boolean statusSuccess,
-                         @RequestParam(name = "statusErr", required = false) Boolean statusErr) {
-        model.addAttribute("statusSuccess", statusSuccess != null);
-        model.addAttribute("statusErr", statusErr != null);
+                         @RequestParam(name = "statusErr", required = false) Boolean statusErr,
+                         HttpSession session) {
         Optional<Item> item = service.findByIdItem(id);
-        if (!item.isPresent()) {
-            return "redirect:/?statusErr=true";
+        User user = getUserSession(session);
+        if (item.isPresent() && user.equals(item.get().getUser())) {
+            model.addAttribute("user", user);
+            model.addAttribute("statusSuccess", statusSuccess != null);
+            model.addAttribute("statusErr", statusErr != null);
+            model.addAttribute("item", item.get());
+            return "detail";
         }
-        model.addAttribute("item", item.get());
-        return "detail";
+        return "redirect:/?statusErr=true";
     }
 
     /**
-     * Вызов вида new.html для добавления задания
+     * Вызов вида newItem.html для добавления задания
      *
+     * @param model   Model
+     * @param session HttpSession
      * @return String
      */
     @GetMapping("/new")
-    public String addItem(@ModelAttribute("item") Item item) {
+    public String addItem(Model model,
+                          HttpSession session) {
+        model.addAttribute("user", getUserSession(session));
         return "new";
     }
 
@@ -112,7 +131,9 @@ public class ItemsController {
      * @return String.
      */
     @PostMapping("/createItem")
-    public String createItem(@ModelAttribute("item") Item item) {
+    public String createItem(@ModelAttribute("item") Item item,
+                             HttpSession session) {
+        item.setUser((User) session.getAttribute("user"));
         service.add(item);
         return "redirect:/detail/" + item.getId() + "?statusSuccess=true";
     }
@@ -120,14 +141,23 @@ public class ItemsController {
     /**
      * Метод вызывает вид редактирования задания.
      *
-     * @param model Model
-     * @param id    int
+     * @param model   Model
+     * @param item    Item
+     * @param session HttpSession
      * @return String
      */
-    @GetMapping("/detail/edit/{id}")
-    public String edit(Model model, @PathVariable int id) {
-        model.addAttribute("item", service.findByIdItem(id).get());
-        return "edit";
+    @GetMapping("/edit")
+    public String edit(Model model,
+                       @ModelAttribute("item") Item item,
+                       HttpSession session) {
+        User user = getUserSession(session);
+        Optional<Item> findItem = service.findByIdItem(item.getId());
+        if (findItem.isPresent() && user.equals(findItem.get().getUser())) {
+            model.addAttribute("user", user);
+            model.addAttribute("item", findItem.get());
+            return "edit";
+        }
+        return "redirect:/?statusErr=true";
     }
 
     /**
@@ -170,5 +200,20 @@ public class ItemsController {
             return "redirect:/detail/" + id + "?statusErr=true";
         }
         return "redirect:/?statusSuccess=true";
+    }
+
+    /**
+     * Метод возврощает текущего пользовотеля из HttpSession.
+     *
+     * @param session HttpSession
+     * @return User.
+     */
+    private User getUserSession(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            user = User.of("Гость", "");
+            user.setId(-1);
+        }
+        return user;
     }
 }

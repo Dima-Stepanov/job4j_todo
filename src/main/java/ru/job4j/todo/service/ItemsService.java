@@ -2,6 +2,7 @@ package ru.job4j.todo.service;
 
 import org.springframework.stereotype.Service;
 import ru.job4j.todo.model.Item;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.store.Store;
 
 import java.time.LocalDateTime;
@@ -20,9 +21,9 @@ import java.util.Optional;
  */
 @Service
 public class ItemsService {
-    private final Store<Item> store;
+    private final Store<Item, User> store;
 
-    public ItemsService(Store<Item> store) {
+    public ItemsService(Store<Item, User> store) {
         this.store = store;
     }
 
@@ -30,7 +31,6 @@ public class ItemsService {
      * Создание заявки.
      *
      * @param item Item.
-     * @return Optional.
      */
     public void add(Item item) {
         store.create(item);
@@ -89,8 +89,8 @@ public class ItemsService {
      *
      * @return List.
      */
-    public List<Item> findAllItem() {
-        return store.findAll();
+    public List<Item> findAllItem(final User user) {
+        return store.findAll(user);
     }
 
     /**
@@ -98,8 +98,8 @@ public class ItemsService {
      *
      * @return List
      */
-    public List<Item> findNewItem() {
-        return store.findNew();
+    public List<Item> findNewItem(final User user) {
+        return store.findNew(user);
     }
 
     /**
@@ -107,7 +107,7 @@ public class ItemsService {
      *
      * @return List.
      */
-    public List<Item> findCompletedItem() {
-        return store.findCompleted();
+    public List<Item> findDoneItem(final User user) {
+        return store.findDone(user);
     }
 }

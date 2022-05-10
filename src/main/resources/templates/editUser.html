@@ -24,28 +24,25 @@
 <body>
 <div class="container py-3">
     <header th:insert="blocks/header :: header"></header>
-    <h2 class="display-6 text-center mb-4">Редактирование задания</h2>
-    <hr class="my-4">
-    <form th:action="@{/editItem}" method="post" th:object="${item}">
-        <input type="hidden" name="id" th:field="*{id}">
-        <div class="row g-3">
-            <div class="col-sm-6">
-                <label for="name" class="form-label">Имя задания</label>
-                <input type="text" class="form-control" name="name" id="name"
-                       th:value="*{name}">
-            </div>
-            <div class="col-12">
-                <label for="description" class="form-label">Описание задания</label>
-                <div class="input-group has-validation">
-                    <input type="text" class="form-control" name="description" id="description"
-                           th:value="*{description}">
-                </div>
-            </div>
+    <main class="form-signin">
+        <div th:if="${userErr}" class="alert alert-danger" role="alert">
+            Такое имя уже используется.
         </div>
-        <div class="my-4">
-            <button value="editItem" type="submit" class="w-100 btn btn-primary btn-lg">Сохранить</button>
-        </div>
-    </form>
+        <form th:action="@{editUser}" method="post" th:object="${editUser}">
+            <input type="hidden" name="id" th:field="*{id}">
+            <h1 class="h3 mb-3 fw-normal">Редактирование пользователя</h1>
+            <div class="form-floating mb-3">
+                <label for="name">Имя пользователя</label>
+                <input type="text" class="form-control" id="name" name="name" th:value="*{name}">
+            </div>
+            <div class="form-floating mb-3">
+                <label for="password">Пароль</label>
+                <input type="password" class="form-control" id="password" name="password">
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Сохранить изминения
+            </button>
+        </form>
+    </main>
     <footer th:insert="blocks/footer :: footer"></footer>
 </div>
 </body>
