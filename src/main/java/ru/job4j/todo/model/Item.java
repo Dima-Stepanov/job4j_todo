@@ -4,7 +4,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 3. Мидл
@@ -34,6 +36,8 @@ public class Item implements Comparable<Item>, Serializable {
     private User user;
     @Transient
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss");
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Category> categories = new CopyOnWriteArrayList<>();
 
     public static Item of(String name, String description, User user) {
         Item item = new Item();
@@ -99,6 +103,18 @@ public class Item implements Comparable<Item>, Serializable {
         this.user = user;
     }
 
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void addCategory(Category category) {
+        categories.add(category);
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -119,7 +135,7 @@ public class Item implements Comparable<Item>, Serializable {
     @Override
     public String toString() {
         return String.format("id: %s, name: %s, description: %s, create: %s, done %s",
-                id, name, description,
+                id, name, description, user,
                 formatter.format(created),
                 formatter.format(done));
     }

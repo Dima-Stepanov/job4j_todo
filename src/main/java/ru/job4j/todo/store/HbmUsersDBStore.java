@@ -6,7 +6,6 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.User;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -105,9 +104,8 @@ public class HbmUsersDBStore {
     private <T> T tx(final Function<Session, T> command) {
         final Session session = sf.openSession();
         final Transaction tx = session.beginTransaction();
-        T rsl = null;
         try {
-            rsl = command.apply(session);
+            T rsl = command.apply(session);
             tx.commit();
             return rsl;
         } catch (final Exception e) {

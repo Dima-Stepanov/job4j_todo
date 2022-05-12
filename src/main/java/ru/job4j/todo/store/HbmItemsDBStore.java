@@ -9,6 +9,7 @@ import ru.job4j.todo.model.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 /**
@@ -36,10 +37,20 @@ public class HbmItemsDBStore implements Store<Item, User> {
      * Применение шаблона WRAPPER.
      *
      * @param item Item
+     * @return Boolean
      */
     @Override
-    public void create(final Item item) {
-        this.tx(session -> session.save(item));
+    public boolean create(final Item item) {
+        try {
+            this.tx(session -> {
+                        session.persist(item);
+                        return true;
+                    }
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -66,16 +77,17 @@ public class HbmItemsDBStore implements Store<Item, User> {
      */
     @Override
     public boolean update(int id, final Item item) {
-        return this.tx(
-                session -> session.createQuery("update Item set name=:name, description=:description, "
-                                + "created=:created, done=:done where id=:id")
-                        .setParameter("id", id)
-                        .setParameter("name", item.getName())
-                        .setParameter("description", item.getDescription())
-                        .setParameter("created", item.getCreated())
-                        .setParameter("done", item.getDone())
-                        .executeUpdate() > 0
-        );
+        try {
+            this.tx(session -> {
+                        item.setId(id);
+                        session.update(item);
+                        return true;
+                    }
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -87,10 +99,11 @@ public class HbmItemsDBStore implements Store<Item, User> {
      */
     @Override
     public boolean delete(int id) {
-        return this.tx(
-                session -> session.createQuery("delete Item where id=:id")
-                        .setParameter("id", id)
-                        .executeUpdate() > 0
+        return this.tx(session -> {
+                    Item item = session.get(Item.class, id);
+                    session.delete(item);
+                    return true;
+                }
         );
     }
 
@@ -143,7 +156,7 @@ public class HbmItemsDBStore implements Store<Item, User> {
      * Шаблон проектирования WRAPPER.
      *
      * @param command Function
-     * @param <T> T
+     * @param <T>     T
      * @return T
      */
     private <T> T tx(final Function<Session, T> command) {
