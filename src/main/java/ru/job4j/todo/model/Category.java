@@ -2,35 +2,39 @@ package ru.job4j.todo.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 3. Мидл
  * 3.3. Hibernate
  * 3.3.2. Mapping
- * 0. ToOne [#6873]
- * Модель данных User.
- * Отношение ManyToOn Item->User.
+ * 4. Категории в TODO List [#331991]
+ * Category модель данных категории заявки.
  *
  * @author Dmitry Stepanov, user Dmitry
- * @since 06.05.2022
+ * @since 12.05.2022
  */
 @Entity
-@Table(name = "users")
-public class User implements Serializable {
+@Table(name = "category")
+public class Category implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(unique = true, nullable = false)
-    private String name;
     @Column(nullable = false)
-    private String password;
+    private String name;
 
-    public static User of(String name, String password) {
-        User user = new User();
-        user.name = name;
-        user.password = password;
-        return user;
+    public static Category of(String name) {
+        Category category = new Category();
+        category.name = name;
+        return category;
+    }
+
+    public static Category of(int id) {
+        Category category = new Category();
+        category.id = id;
+        return category;
     }
 
     public int getId() {
@@ -49,14 +53,6 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -65,12 +61,17 @@ public class User implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        User user = (User) o;
-        return id == user.id;
+        Category category = (Category) o;
+        return id == category.id;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Category{id=" + id + "|name=" + name + '}';
     }
 }

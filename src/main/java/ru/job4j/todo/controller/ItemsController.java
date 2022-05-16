@@ -3,18 +3,25 @@ package ru.job4j.todo.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.ItemsService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 3. Мидл
  * 3.3. Hibernate
  * 3.3.1. Конфигурирование
  * 2. Создать TODO list [#3786]
+ * 4. Категории в TODO List [#331991]
+ * 3.3.2. Mapping
+ * 4. Категории в TODO List [#331991]
  * ItemController контроллер отоброжения видов.
  *
  * @author Dmitry Stepanov, user Dmitry
@@ -22,13 +29,15 @@ import java.util.Optional;
  */
 @Controller
 public class ItemsController {
-    private final ItemsService service;
+    private final ItemsService itemsService;
+    private final CategoryService categoryService;
     private static final String ALL_ITEM = "Все задания";
     private static final String COMPLETED_ITEM = "Завершенные задания";
     private static final String NEW_ITEM = "Новые задания";
 
-    public ItemsController(ItemsService service) {
-        this.service = service;
+    public ItemsController(ItemsService itemsService, CategoryService categoryService) {
+        this.itemsService = itemsService;
+        this.categoryService = categoryService;
     }
 
     /**
@@ -47,7 +56,7 @@ public class ItemsController {
         model.addAttribute("statusSuccess", statusSuccess != null);
         model.addAttribute("statusErr", statusErr != null);
         model.addAttribute("pageName", ALL_ITEM);
-        model.addAttribute("items", service.findAllItem(user));
+        model.addAttribute("items", itemsService.findAllItem(user));
         return "index";
     }
 
@@ -62,7 +71,7 @@ public class ItemsController {
         User user = getUserSession(session);
         model.addAttribute("user", user);
         model.addAttribute("pageName", COMPLETED_ITEM);
-        model.addAttribute("items", service.findDoneItem(user));
+        model.addAttribute("items", itemsService.findDoneItem(user));
         return "index";
     }
 
@@ -78,7 +87,7 @@ public class ItemsController {
         User user = getUserSession(session);
         model.addAttribute("user", user);
         model.addAttribute("pageName", NEW_ITEM);
-        model.addAttribute("items", service.findNewItem(user));
+        model.addAttribute("items", itemsService.findNewItem(user));
         return "index";
     }
 
@@ -98,13 +107,14 @@ public class ItemsController {
                          @RequestParam(name = "statusSuccess", required = false) Boolean statusSuccess,
                          @RequestParam(name = "statusErr", required = false) Boolean statusErr,
                          HttpSession session) {
-        Optional<Item> item = service.findByIdItem(id);
+        Optional<Item> item = itemsService.findByIdItem(id);
         User user = getUserSession(session);
         if (item.isPresent() && user.equals(item.get().getUser())) {
             model.addAttribute("user", user);
             model.addAttribute("statusSuccess", statusSuccess != null);
             model.addAttribute("statusErr", statusErr != null);
             model.addAttribute("item", item.get());
+            model.addAttribute("categories", item.get().getCategory());
             return "detail";
         }
         return "redirect:/?statusErr=true";
@@ -120,6 +130,7 @@ public class ItemsController {
     @GetMapping("/new")
     public String addItem(Model model,
                           HttpSession session) {
+        model.addAttribute("allCategory", categoryService.allCategory());
         model.addAttribute("user", getUserSession(session));
         return "new";
     }
@@ -132,9 +143,12 @@ public class ItemsController {
      */
     @PostMapping("/createItem")
     public String createItem(@ModelAttribute("item") Item item,
+                             HttpServletRequest req,
                              HttpSession session) {
+        String[] catId = req.getParameterValues("catId");
         item.setUser((User) session.getAttribute("user"));
-        service.add(item);
+        item.setCategory(categoryService.getSelectCategory(catId));
+        itemsService.add(item);
         return "redirect:/detail/" + item.getId() + "?statusSuccess=true";
     }
 
@@ -151,8 +165,9 @@ public class ItemsController {
                        @ModelAttribute("item") Item item,
                        HttpSession session) {
         User user = getUserSession(session);
-        Optional<Item> findItem = service.findByIdItem(item.getId());
+        Optional<Item> findItem = itemsService.findByIdItem(item.getId());
         if (findItem.isPresent() && user.equals(findItem.get().getUser())) {
+            model.addAttribute("allCategory", categoryService.allCategory());
             model.addAttribute("user", user);
             model.addAttribute("item", findItem.get());
             return "edit";
@@ -167,8 +182,13 @@ public class ItemsController {
      * @return String
      */
     @PostMapping("/editItem")
-    public String editItem(@ModelAttribute("item") Item item) {
-        if (!service.updateItem(item.getId(), item)) {
+    public String editItem(@ModelAttribute("item") Item item,
+                           HttpSession session,
+                           HttpServletRequest req) {
+        String[] catId = req.getParameterValues("catId");
+        item.setUser(getUserSession(session));
+        item.setCategory(categoryService.getSelectCategory(catId));
+        if (!itemsService.updateItem(item.getId(), item)) {
             return "redirect:/?statusErr=true";
         }
         return "redirect:/detail/" + item.getId() + "?statusSuccess=true";
@@ -182,7 +202,7 @@ public class ItemsController {
      */
     @PostMapping("/doneItem")
     public String doneItem(@ModelAttribute("id") int id) {
-        if (!service.doneItem(id)) {
+        if (!itemsService.doneItem(id)) {
             return "redirect:/detail/" + id + "?statusErr=true";
         }
         return "redirect:/detail/" + id + "?statusSuccess=true";
@@ -196,7 +216,7 @@ public class ItemsController {
      */
     @PostMapping("/deleteItem")
     public String deleteItem(@ModelAttribute("id") int id) {
-        if (!service.deleteItem(id)) {
+        if (!itemsService.deleteItem(id)) {
             return "redirect:/detail/" + id + "?statusErr=true";
         }
         return "redirect:/?statusSuccess=true";

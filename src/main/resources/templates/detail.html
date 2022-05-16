@@ -44,6 +44,9 @@
             <p class="col-md-8 fs-4">
                 Описание: <span th:text="${item.description}"/>
             </p>
+            <p class="col-md-8 fs-4">Категория:
+                <span th:each="category: ${categories}"  th:text="${category.name} + '; '"/>
+            </p>
             <p class="col-md-8 fs-4">
                 Дата создания: <span th:text="${item.getCreatedFormat()}"/>
             </p>

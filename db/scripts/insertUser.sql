@@ -1,2 +1,2 @@
-insert into users(name, password) values('Катя', 'pass');
-insert into users(name, password) values('Валентин', '999pass');
+insert into users(name, password) values('Катя', '1');
+insert into users(name, password) values('Дима', '1');

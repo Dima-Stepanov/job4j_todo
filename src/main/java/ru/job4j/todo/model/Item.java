@@ -4,7 +4,10 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 3. Мидл
@@ -15,13 +18,15 @@ import java.util.Objects;
  * 3.3.2. Mapping
  * 0. ToOne [#6873]
  * Отношение ManyToOn Item->User.
+ * 3.3.2. Mapping
+ * 4. Категории в TODO List [#331991]
  *
  * @author Dmitry Stepanov, user Dmitry
  * @since 29.04.2022
  */
 @Entity
 @Table(name = "items")
-public class Item implements Comparable<Item>, Serializable {
+public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -34,6 +39,8 @@ public class Item implements Comparable<Item>, Serializable {
     private User user;
     @Transient
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss");
+    @ManyToMany(cascade = {CascadeType.MERGE})
+    private Set<Category> category = new CopyOnWriteArraySet<>();
 
     public static Item of(String name, String description, User user) {
         Item item = new Item();
@@ -99,6 +106,14 @@ public class Item implements Comparable<Item>, Serializable {
         this.user = user;
     }
 
+    public Set<Category> getCategory() {
+        return category;
+    }
+
+    public void setCategory(Set<Category> category) {
+        this.category = category;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -119,13 +134,8 @@ public class Item implements Comparable<Item>, Serializable {
     @Override
     public String toString() {
         return String.format("id: %s, name: %s, description: %s, create: %s, done %s",
-                id, name, description,
+                id, name, description, user,
                 formatter.format(created),
                 formatter.format(done));
-    }
-
-    @Override
-    public int compareTo(Item item) {
-        return Integer.compare(id, item.id);
     }
 }

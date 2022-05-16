@@ -4,12 +4,15 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
+import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.User;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 3. Мидл
@@ -19,6 +22,8 @@ import java.util.function.Function;
  * 3. Лямбды и шаблон wrapper. [#49295]
  * HdmItemsDBStore хранилище в базе данных модели данных Item,
  * используется hibernate.
+ * 3.3.2. Mapping
+ * 4. Категории в TODO List [#331991]
  *
  * @author Dmitry Stepanov, user Dmitry
  * @since 29.04.2022
@@ -36,10 +41,14 @@ public class HbmItemsDBStore implements Store<Item, User> {
      * Применение шаблона WRAPPER.
      *
      * @param item Item
+     * @return Boolean
      */
     @Override
     public void create(final Item item) {
-        this.tx(session -> session.save(item));
+        this.tx(session -> {
+            session.persist(item);
+            return item;
+        });
     }
 
     /**
@@ -51,8 +60,18 @@ public class HbmItemsDBStore implements Store<Item, User> {
      */
     @Override
     public Optional<Item> findById(int id) {
-        return this.tx(
-                session -> Optional.ofNullable(session.get(Item.class, id))
+        return this.tx(session -> {
+                    Optional<Item> result = Optional.ofNullable(session.get(Item.class, id));
+                    if (result.isPresent()) {
+                        if (!result.get().getCategory().isEmpty()) {
+                            result.get().setCategory(
+                                    result.get().getCategory()
+                                            .parallelStream()
+                                            .collect(Collectors.toSet()));
+                        }
+                    }
+                    return result;
+                }
         );
     }
 
@@ -66,16 +85,19 @@ public class HbmItemsDBStore implements Store<Item, User> {
      */
     @Override
     public boolean update(int id, final Item item) {
-        return this.tx(
-                session -> session.createQuery("update Item set name=:name, description=:description, "
-                                + "created=:created, done=:done where id=:id")
-                        .setParameter("id", id)
-                        .setParameter("name", item.getName())
-                        .setParameter("description", item.getDescription())
-                        .setParameter("created", item.getCreated())
-                        .setParameter("done", item.getDone())
-                        .executeUpdate() > 0
-        );
+        AtomicBoolean result = new AtomicBoolean(false);
+        try {
+            this.tx(session -> {
+                        item.setId(id);
+                        session.update(item);
+                        result.set(true);
+                        return result.get();
+                    }
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result.get();
     }
 
     /**
@@ -87,10 +109,11 @@ public class HbmItemsDBStore implements Store<Item, User> {
      */
     @Override
     public boolean delete(int id) {
-        return this.tx(
-                session -> session.createQuery("delete Item where id=:id")
-                        .setParameter("id", id)
-                        .executeUpdate() > 0
+        return this.tx(session -> {
+                    Item item = session.get(Item.class, id);
+                    session.remove(item);
+                    return true;
+                }
         );
     }
 
@@ -143,7 +166,7 @@ public class HbmItemsDBStore implements Store<Item, User> {
      * Шаблон проектирования WRAPPER.
      *
      * @param command Function
-     * @param <T> T
+     * @param <T>     T
      * @return T
      */
     private <T> T tx(final Function<Session, T> command) {
@@ -154,7 +177,7 @@ public class HbmItemsDBStore implements Store<Item, User> {
             tx.commit();
             return rsl;
         } catch (final Exception e) {
-            session.getTransaction().rollback();
+            tx.rollback();
             throw e;
         } finally {
             session.close();

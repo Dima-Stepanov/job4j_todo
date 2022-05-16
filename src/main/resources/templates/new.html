@@ -34,10 +34,17 @@
             </div>
             <div class="col-12">
                 <label for="description" class="form-label">Описание задания</label>
-                <div class="input-group has-validation">
-                    <input type="text" class="form-control" name="description" id="description"
-                           placeholder="Описание задания">
-                </div>
+                <input type="text" class="form-control" name="description" id="description"
+                       placeholder="Описание задания">
+            </div>
+            <div class="col-12">
+                <label for="catId">Категории задачи</label>
+                <select class="form-control" id="catId" name="catId" multiple="multiple">
+                    <option th:each="cat : ${allCategory}"
+                            th:value="${cat.id}"
+                            th:text="${cat.name}">
+                    </option>
+                </select>
             </div>
         </div>
         <div class="my-4">

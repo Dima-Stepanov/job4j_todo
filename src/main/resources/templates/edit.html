@@ -41,6 +41,15 @@
                            th:value="*{description}">
                 </div>
             </div>
+            <div class="col-12">
+                <label for="catId">Категории задачи</label>
+                <select class="form-control" id="catId" name="catId" multiple="multiple">
+                    <option th:each="cat : ${allCategory}"
+                            th:value="${cat.id}"
+                            th:text="${cat.name}">
+                    </option>
+                </select>
+            </div>
         </div>
         <div class="my-4">
             <button value="editItem" type="submit" class="w-100 btn btn-primary btn-lg">Сохранить</button>

@@ -6,7 +6,6 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.User;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -36,16 +35,14 @@ public class HbmUsersDBStore {
      * @return boolean.
      */
     public boolean create(final User user) {
-        return tx(session -> {
-            boolean result = false;
-            if (session.createQuery("from User where name=:name")
-                    .setParameter("name", user.getName())
-                    .uniqueResultOptional().isEmpty()) {
-                session.save(user);
-                result = true;
-            }
-            return result;
-        });
+        boolean rsl = false;
+        try {
+            tx(session -> session.save(user));
+            rsl = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rsl;
     }
 
     /**
@@ -68,20 +65,19 @@ public class HbmUsersDBStore {
      * @return Optional.
      */
     public boolean update(int id, final User user) {
-        return tx(session -> {
-            if (session.createQuery("from User where id!=:id and name=:name")
-                    .setParameter("id", id)
+        boolean rsl = false;
+        try {
+            rsl = tx(session -> session.createQuery("update User set name=:name, password=:password "
+                            + "where id=:id")
                     .setParameter("name", user.getName())
-                    .uniqueResultOptional().isEmpty()) {
-                return session.createQuery("update User set name=:name, password=:password "
-                                + "where id=:id")
-                        .setParameter("name", user.getName())
-                        .setParameter("password", user.getPassword())
-                        .setParameter("id", id)
-                        .executeUpdate() > 0;
-            }
-            return false;
-        });
+                    .setParameter("password", user.getPassword())
+                    .setParameter("id", id)
+                    .executeUpdate() > 0
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rsl;
     }
 
     /**

@@ -6,5 +6,10 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
     <include file="scripts/users.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/category.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/insertCategory.sql" relativeToChangelogFile="true"/>
     <include file="scripts/items.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/category.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/items_category.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/insertCategory.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>
