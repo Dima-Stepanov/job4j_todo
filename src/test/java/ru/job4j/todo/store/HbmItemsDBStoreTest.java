@@ -11,6 +11,7 @@ import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.User;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,7 +118,7 @@ public class HbmItemsDBStoreTest {
         userStore.create(user);
         Item item = Item.of("item", "desc Item", user);
         Item item1 = Item.of("item1", "desc Item1", user);
-        item1.setDone(LocalDateTime.now());
+        item1.setDone(new Date(System.currentTimeMillis()));
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         store.create(item1);
@@ -135,8 +136,8 @@ public class HbmItemsDBStoreTest {
         Item item1 = Item.of("item", "desc Item", user);
         Item item2 = Item.of("item", "desc Item", user);
         Item item3 = Item.of("item", "desc Item", user);
-        item1.setDone(LocalDateTime.now());
-        item3.setDone(LocalDateTime.now());
+        item1.setDone(new Date(System.currentTimeMillis()));
+        item3.setDone(new Date(System.currentTimeMillis()));
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         store.create(item1);
@@ -156,8 +157,8 @@ public class HbmItemsDBStoreTest {
         Item item1 = Item.of("item", "desc Item", user);
         Item item2 = Item.of("item", "desc Item", user);
         Item item3 = Item.of("item", "desc Item", user);
-        item1.setDone(LocalDateTime.now());
-        item3.setDone(LocalDateTime.now());
+        item1.setDone(new Date(System.currentTimeMillis()));
+        item3.setDone(new Date(System.currentTimeMillis()));
         HbmItemsDBStore store = new HbmItemsDBStore(sf);
         store.create(item);
         store.create(item1);

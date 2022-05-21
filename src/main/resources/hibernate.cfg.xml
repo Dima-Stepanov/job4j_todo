@@ -14,6 +14,7 @@
         <property name="hibernate.format_sql">true</property>
         <property name="hibernate.use_sql_comments">true</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL10Dialect</property>
+        <property name="hibernate.jdbc.time_zone">UTC</property>
         <mapping class="ru.job4j.todo.model.User"/>
         <mapping class="ru.job4j.todo.model.Item"/>
         <mapping class="ru.job4j.todo.model.Category"/>

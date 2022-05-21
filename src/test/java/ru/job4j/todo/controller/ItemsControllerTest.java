@@ -11,10 +11,7 @@ import ru.job4j.todo.service.ItemsService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,11 +38,11 @@ public class ItemsControllerTest {
         User user = User.of("User", "pass");
         Item item1 = Item.of("Item1", "desc Item1", user);
         item1.setId(1);
-        item1.setCreated(LocalDateTime.now().withNano(0).minusDays(5));
-        item1.setDone(LocalDateTime.now().withNano(0));
+        item1.setCreated(new Date(System.currentTimeMillis()));
+        item1.setDone(new Date(System.currentTimeMillis()));
         Item item2 = Item.of("Item1", "desc Item1", user);
         item2.setId(2);
-        item2.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item2.setCreated(new Date(System.currentTimeMillis()));
         List<Item> items = Arrays.asList(item1, item2);
         Model model = mock(Model.class);
         CategoryService categoryService = mock(CategoryService.class);
@@ -68,8 +65,8 @@ public class ItemsControllerTest {
         User user1 = User.of("User", "pass");
         Item item1 = Item.of("Item1", "desc Item1", user1);
         item1.setId(1);
-        item1.setCreated(LocalDateTime.now().withNano(0).minusDays(5));
-        item1.setDone(LocalDateTime.now().withNano(0));
+        item1.setCreated(new Date(System.currentTimeMillis()));
+        item1.setDone(new Date(System.currentTimeMillis()));
         List<Item> items = Arrays.asList(item1);
         Model model = mock(Model.class);
         CategoryService categoryService = mock(CategoryService.class);
@@ -90,7 +87,7 @@ public class ItemsControllerTest {
         User user2 = User.of("User2", "pass2");
         Item item2 = Item.of("Item1", "desc Item1", user2);
         item2.setId(2);
-        item2.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item2.setCreated(new Date(System.currentTimeMillis()));
         List<Item> items = Arrays.asList(item2);
         Model model = mock(Model.class);
         CategoryService categoryService = mock(CategoryService.class);
@@ -115,7 +112,7 @@ public class ItemsControllerTest {
         category.add(Category.of(2));
         item.setCategory(category);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         Model model = mock(Model.class);
         CategoryService categoryService = mock(CategoryService.class);
         ItemsService itemsService = mock(ItemsService.class);
@@ -168,7 +165,7 @@ public class ItemsControllerTest {
         User user = User.of("User2", "pass2");
         Item item = Item.of("Item1", "desc Item1", user);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         CategoryService categoryService = mock(CategoryService.class);
         ItemsService itemsService = mock(ItemsService.class);
         ItemsController itemsController = new ItemsController(itemsService, categoryService);
@@ -187,7 +184,7 @@ public class ItemsControllerTest {
         CategoryService categoryService = mock(CategoryService.class);
         when(categoryService.allCategory()).thenReturn(categoryList);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         Model model = mock(Model.class);
         ItemsService itemsService = mock(ItemsService.class);
         when(itemsService.findByIdItem(item.getId())).thenReturn(Optional.of(item));
@@ -210,7 +207,7 @@ public class ItemsControllerTest {
         category.add(Category.of(2));
         item.setCategory(category);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         HttpSession httpSession = mock(HttpSession.class);
         when(httpSession.getAttribute("user")).thenReturn(user);
         HttpServletRequest req = mock(HttpServletRequest.class);
@@ -232,7 +229,7 @@ public class ItemsControllerTest {
         category.add(Category.of(2));
         item.setCategory(category);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         HttpSession httpSession = mock(HttpSession.class);
         when(httpSession.getAttribute("user")).thenReturn(user);
         HttpServletRequest req = mock(HttpServletRequest.class);
@@ -250,7 +247,7 @@ public class ItemsControllerTest {
         User user = User.of("User2", "pass2");
         Item item = Item.of("Item1", "desc Item1", user);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         Model model = mock(Model.class);
         CategoryService categoryService = mock(CategoryService.class);
         ItemsService itemsService = mock(ItemsService.class);
@@ -265,7 +262,7 @@ public class ItemsControllerTest {
         User user = User.of("User2", "pass2");
         Item item = Item.of("Item1", "desc Item1", user);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         Model model = mock(Model.class);
         CategoryService categoryService = mock(CategoryService.class);
         ItemsService itemsService = mock(ItemsService.class);
@@ -280,7 +277,7 @@ public class ItemsControllerTest {
         User user = User.of("User2", "pass2");
         Item item = Item.of("Item1", "desc Item1", user);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         Model model = mock(Model.class);
         CategoryService categoryService = mock(CategoryService.class);
         ItemsService itemsService = mock(ItemsService.class);
@@ -295,7 +292,7 @@ public class ItemsControllerTest {
         User user = User.of("User2", "pass2");
         Item item = Item.of("Item1", "desc Item1", user);
         item.setId(2);
-        item.setCreated(LocalDateTime.now().withNano(0).minusDays(10));
+        item.setCreated(new Date(System.currentTimeMillis()));
         Model model = mock(Model.class);
         CategoryService categoryService = mock(CategoryService.class);
         ItemsService itemsService = mock(ItemsService.class);

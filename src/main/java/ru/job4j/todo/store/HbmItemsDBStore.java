@@ -8,6 +8,8 @@ import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.User;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -172,15 +174,13 @@ public class HbmItemsDBStore implements Store<Item, User> {
     private <T> T tx(final Function<Session, T> command) {
         final Session session = sf.openSession();
         final Transaction tx = session.beginTransaction();
-        try {
+        try (session) {
             T rsl = command.apply(session);
             tx.commit();
             return rsl;
         } catch (final Exception e) {
             tx.rollback();
             throw e;
-        } finally {
-            session.close();
         }
     }
 }
