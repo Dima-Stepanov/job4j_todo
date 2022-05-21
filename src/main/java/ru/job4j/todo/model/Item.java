@@ -2,6 +2,8 @@ package ru.job4j.todo.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -32,13 +34,15 @@ public class Item implements Serializable {
     private int id;
     private String name;
     private String description;
-    private LocalDateTime created = LocalDateTime.now().withNano(0);
-    private LocalDateTime done;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created = new Date(System.currentTimeMillis());
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date done;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
     @Transient
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss");
+    private final DateFormat formatter = new SimpleDateFormat("dd-MMMM-yyyy HH:mm:ss");
     @ManyToMany(cascade = {CascadeType.MERGE})
     private Set<Category> category = new CopyOnWriteArraySet<>();
 
@@ -74,7 +78,7 @@ public class Item implements Serializable {
         this.description = description;
     }
 
-    public LocalDateTime getCreated() {
+    public Date getCreated() {
         return created;
     }
 
@@ -82,11 +86,11 @@ public class Item implements Serializable {
         return formatter.format(created);
     }
 
-    public void setCreated(LocalDateTime created) {
+    public void setCreated(Date created) {
         this.created = created;
     }
 
-    public LocalDateTime getDone() {
+    public Date getDone() {
         return done;
     }
 
@@ -94,7 +98,7 @@ public class Item implements Serializable {
         return formatter.format(done);
     }
 
-    public void setDone(LocalDateTime done) {
+    public void setDone(Date done) {
         this.done = done;
     }
 

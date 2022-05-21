@@ -37,7 +37,7 @@
         <profile>
             <id>production</id>
             <properties>
-                <db.url>jdbc:postgresql://127.0.0.1:5432/cinema_db</db.url>
+                <db.url>jdbc:postgresql://127.0.0.1:5432/todo_db</db.url>
                 <db.username>postgres</db.username>
                 <db.password>password</db.password>
                 <db.driver>org.postgresql.Driver</db.driver>

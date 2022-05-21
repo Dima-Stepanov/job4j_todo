@@ -6,6 +6,7 @@ import ru.job4j.todo.model.User;
 import ru.job4j.todo.store.Store;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,7 +68,7 @@ public class ItemsService {
         boolean result = false;
         Optional<Item> item = store.findById(id);
         if (item.isPresent()) {
-            item.get().setDone(LocalDateTime.now().withNano(0));
+            item.get().setDone(new Date(System.currentTimeMillis()));
             store.update(item.get().getId(), item.get());
             result = true;
         }
