@@ -2,22 +2,21 @@ package ru.job4j.todo.store;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import ru.job4j.todo.TodoApplication;
 import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.User;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 3. Мидл
@@ -33,17 +32,17 @@ import static org.junit.Assert.*;
 public class HbmItemsDBStoreTest {
     static SessionFactory sf;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() {
         sf = new TodoApplication().sessionFactory();
     }
 
-    @AfterClass
+    @AfterAll
     public static void closeSf() {
         sf.close();
     }
 
-    @After
+    @AfterEach
     public void clearDB() {
         Session session = sf.openSession();
         session.beginTransaction();

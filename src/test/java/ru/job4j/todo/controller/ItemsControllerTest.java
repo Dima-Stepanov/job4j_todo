@@ -1,6 +1,6 @@
 package ru.job4j.todo.controller;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
 import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
@@ -10,7 +10,6 @@ import ru.job4j.todo.service.ItemsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
