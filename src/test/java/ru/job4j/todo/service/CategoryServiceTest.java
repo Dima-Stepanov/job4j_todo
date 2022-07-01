@@ -1,12 +1,12 @@
 package ru.job4j.todo.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import ru.job4j.todo.model.Category;
 import ru.job4j.todo.store.HdmCategoryDBStory;
 
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
