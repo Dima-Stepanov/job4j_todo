@@ -2,9 +2,7 @@ package ru.job4j.todo.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 3. Мидл

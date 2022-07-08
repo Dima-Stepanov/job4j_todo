@@ -3,7 +3,6 @@ package ru.job4j.todo.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
@@ -12,7 +11,6 @@ import ru.job4j.todo.service.ItemsService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 3. Мидл
